@@ -10,20 +10,21 @@ import javax.inject.Inject
 
 class OrderRepositoryImpl @Inject constructor() : OrderRepository {
 
+    private var orderId: Int = 0
     private val orders = MutableStateFlow<List<Order>>(emptyList())
     private val dishes = MutableStateFlow<List<Dish>>(emptyList())
 
     init {
         dishes.value = listOf(
-            Dish(0, "Обед 1", 100),
-            Dish(1, "Обед 2", 200),
-            Dish(2, "Обед 3", 300)
+            Dish(1, "Комплексный обед 1", 100),
+            Dish(2, "Комплексный обед 2", 200),
+            Dish(3, "Комплексный обед 3", 300)
         )
     }
 
     override suspend fun registerOrder(order: Order) {
         orders.update {
-            it + order
+            it + order.copy(id = orderId++)
         }
     }
 

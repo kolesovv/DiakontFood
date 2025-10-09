@@ -3,7 +3,9 @@ package com.github.kolesovv.diakontfood.presentation.screen
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.kolesovv.diakontfood.domain.entity.Dish
+import com.github.kolesovv.diakontfood.domain.entity.Order
 import com.github.kolesovv.diakontfood.domain.usecase.GetDishesUseCase
+import com.github.kolesovv.diakontfood.domain.usecase.GetOrdersUseCase
 import com.github.kolesovv.diakontfood.domain.usecase.RegisterOrderUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,56 +15,78 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-data class OrderViewModel @Inject constructor(
+class OrderViewModel @Inject constructor(
     val getDishesUseCase: GetDishesUseCase,
-    val registerOrderUseCase: RegisterOrderUseCase
+    val registerOrderUseCase: RegisterOrderUseCase,
+    val getOrderUseCase: GetOrdersUseCase
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(OrderState())
+    private val _orders = MutableStateFlow<List<Order>>(emptyList())
+    val orders = _orders.asStateFlow()
+
+    private val _state = MutableStateFlow<OrderState>(OrderState.Initialization)
     val state = _state.asStateFlow()
 
     init {
         viewModelScope.launch {
+            loadDishes()
+        }
+    }
+
+    private fun loadDishes() {
+        viewModelScope.launch {
             getDishesUseCase().collect {
-                _state.value = OrderState().copy(dishes = it)
+                _state.value = OrderState.WaitingForDishSelection(dishes = it)
+            }
+        }
+    }
+
+    private fun loadOrders() {
+        viewModelScope.launch {
+            getOrderUseCase().collect {
+                _orders.value = it
             }
         }
     }
 
     fun processCommand(command: OrderCommands) {
         when (command) {
-            is OrderCommands.ChooseDish -> {
-                viewModelScope.launch {
-                    _state.update { previousState ->
-                        previousState.copy(dishId = command.dishId)
-                    }
-                }
-            }
-
-            is OrderCommands.ScanRFID -> {
-                viewModelScope.launch {
-                    _state.update { previousState ->
-                        previousState.copy(rfid = command.rfid)
-                    }
-                }
+            OrderCommands.RefreshData -> {
+                loadDishes()
             }
 
             is OrderCommands.RegisterOrder -> {
                 viewModelScope.launch {
-                    registerOrderUseCase(
-                        dishId = command.dishId,
-                        rfid = command.rfid
-                    )
+                    registerOrderUseCase(command.dishId, command.rfid)
+                    _state.value = OrderState.Initialization
+                    loadDishes()
+                    loadOrders()
                 }
             }
 
-            OrderCommands.RefreshData -> {
-                viewModelScope.launch {
-                    _state.update { previousState ->
-                        previousState.copy(
-                            dishId = OrderState.DISH_ID_UNSPECIFIED,
-                            rfid = OrderState.RFID_UNSPECIFIED
+            is OrderCommands.ScanRFID -> {
+                _state.update { previousState ->
+                    if (previousState is OrderState.WaitingForRfid) {
+                        val scannedRfid = command.rfid
+                        OrderState.OrderRegistered(
+                            dishId = previousState.selectedDishId,
+                            rfid = scannedRfid
                         )
+                    } else {
+                        previousState
+                    }
+                }
+            }
+
+            is OrderCommands.SelectDish -> {
+                _state.update { previousState ->
+                    if (previousState is OrderState.WaitingForDishSelection) {
+                        OrderState.WaitingForRfid(
+                            dishes = previousState.dishes,
+                            selectedDishId = command.dishId
+                        )
+                    } else {
+                        previousState
                     }
                 }
             }
@@ -72,19 +96,27 @@ data class OrderViewModel @Inject constructor(
 
 sealed interface OrderCommands {
 
-    data class ChooseDish(val dishId: Int) : OrderCommands
+    data class SelectDish(val dishId: Int) : OrderCommands
     data class ScanRFID(val rfid: String) : OrderCommands
     data class RegisterOrder(val dishId: Int, val rfid: String) : OrderCommands
     data object RefreshData : OrderCommands
 }
 
-data class OrderState(
-    val dishes: List<Dish> = listOf(),
-    val dishId: Int = DISH_ID_UNSPECIFIED,
-    val rfid: String = RFID_UNSPECIFIED
-) {
-    companion object {
-        const val DISH_ID_UNSPECIFIED = -1
-        const val RFID_UNSPECIFIED = ""
-    }
+sealed interface OrderState {
+    object Initialization : OrderState
+    data class WaitingForDishSelection(
+        val dishes: List<Dish>,
+        val selectedDishId: Int? = null
+    ) : OrderState
+
+    data class WaitingForRfid(
+        val dishes: List<Dish>,
+        val selectedDishId: Int,
+        val scannedRfid: String? = null
+    ) : OrderState
+
+    data class OrderRegistered(
+        val dishId: Int,
+        val rfid: String
+    ) : OrderState
 }
