@@ -86,7 +86,7 @@ fun OrderScreen(
                             }
                             items(currentOrders) { order ->
                                 Text(
-                                    text = "ID Обеда: ${order.dishId} : RFID: ${order.rfid}",
+                                    text = "ID Обеда: ${order.dishId} : RFID: ${order.cardNumber}",
                                     fontSize = 16.sp
                                 )
                             }
@@ -124,7 +124,7 @@ fun Menu(
             Button(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(4.dp),
-                onClick = { onDishClick(dish.id) }
+                onClick = { onDishClick(dish.dishId) }
             ) {
                 Text(
                     text = "${dish.name}, ${dish.price} ₽",

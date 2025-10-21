@@ -1,15 +1,13 @@
 package com.github.kolesovv.diakontfood.domain.usecase
 
-import com.github.kolesovv.diakontfood.domain.entity.Dish
 import com.github.kolesovv.diakontfood.domain.repository.DiakontFoodRepository
-import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-class GetDishesUseCase @Inject constructor(
+class UpdateDishesUseCase @Inject constructor(
     private val diakontFoodRepository: DiakontFoodRepository
 ) {
 
-    operator fun invoke(): Flow<List<Dish>> {
-        return diakontFoodRepository.getDishes()
+    suspend operator fun invoke() {
+        return diakontFoodRepository.updateDishes()
     }
 }
