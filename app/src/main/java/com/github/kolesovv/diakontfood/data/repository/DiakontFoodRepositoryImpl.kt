@@ -42,7 +42,9 @@ class DiakontFoodRepositoryImpl @Inject constructor(
 
     override suspend fun updateDishes() {
         val dishes = loadDishes()
-        diakontFoodDao.addDishes(dishes)
+        if (dishes.isNotEmpty()) {
+            diakontFoodDao.addDishes(dishes)
+        }
     }
 
     private suspend fun loadDishes(): List<DishDbModel> {
@@ -52,8 +54,7 @@ class DiakontFoodRepositoryImpl @Inject constructor(
             if (e is CancellationException) {
                 throw e
             } else {
-                Log.e("DiakontFoodRepository", e.stackTraceToString())
-                listOf()
+                throw RuntimeException("Не удалось загрузить меню", e)
             }
         }
     }
