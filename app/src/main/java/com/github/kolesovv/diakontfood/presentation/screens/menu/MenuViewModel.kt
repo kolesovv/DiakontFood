@@ -1,4 +1,4 @@
-package com.github.kolesovv.diakontfood.presentation.screen
+package com.github.kolesovv.diakontfood.presentation.screens.menu
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

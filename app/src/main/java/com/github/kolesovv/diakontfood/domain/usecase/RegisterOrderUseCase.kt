@@ -8,8 +8,17 @@ class RegisterOrderUseCase @Inject constructor(
     private val diakontFoodRepository: DiakontFoodRepository
 ) {
 
-    suspend operator fun invoke(dishId: Int, rfid: String) {
-        val order = Order(dishId = dishId, cardNumber = rfid)
-        diakontFoodRepository.saveOrderToLocalDb(order)
+    suspend operator fun invoke(dishIds: List<Int>, payMethod: PayMethod, cardNumber: String) {
+
+        dishIds.forEach { dishId ->
+            val order = Order(dishId = dishId, cardNumber = cardNumber)
+            diakontFoodRepository.saveOrderToRemoteDb(order)
+        }
     }
+}
+
+enum class PayMethod {
+    GUEST,
+    CARD,
+    NO_CARD
 }

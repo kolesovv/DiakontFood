@@ -23,6 +23,9 @@ interface DiakontFoodDao {
     @Query("SELECT * FROM dishes")
     fun getDishes(): Flow<List<DishDbModel>>
 
+    @Query("SELECT * FROM dishes WHERE dishId =:dishId")
+    fun getDishById(dishId: Int): Flow<DishDbModel>
+
     @Delete
     suspend fun deleteOrder(orderDbModel: OrderDbModel)
 

@@ -3,4 +3,14 @@
     <string name="menu">Меню</string>
     <string name="proceed_to_payment">Перейти к оплате</string>
     <string name="repeat">Повторить</string>
+    <string name="Back">Назад</string>
+    <string name="Pay">Оплата</string>
+    <string name="back_to_menu">Вернуться к меню</string>
+    <string name="successful_payment">Оплата успешно выполнена!</string>
+    <string name="Clear">Очистить</string>
+    <string name="selected_positions">Выбрано позиций: %1$d</string>
+    <string name="card_number">Номер карты</string>
+    <string name="pay_by_card">Оплатить картой</string>
+    <string name="pay_as_a_guest">Оплатить как гость</string>
+    <string name="pay_without_a_card">Оплатить без карты</string>
 </resources>

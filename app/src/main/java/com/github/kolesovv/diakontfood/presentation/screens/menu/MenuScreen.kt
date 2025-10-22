@@ -1,4 +1,4 @@
-package com.github.kolesovv.diakontfood.presentation.screen
+package com.github.kolesovv.diakontfood.presentation.screens.menu
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box

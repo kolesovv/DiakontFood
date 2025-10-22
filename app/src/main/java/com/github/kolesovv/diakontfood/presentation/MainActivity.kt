@@ -5,18 +5,35 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import com.github.kolesovv.diakontfood.presentation.screen.MenuScreen
+import androidx.lifecycle.lifecycleScope
+import com.github.kolesovv.diakontfood.domain.usecase.RegisterOrderUseCase
+import com.github.kolesovv.diakontfood.presentation.screens.menu.MenuScreen
+import com.github.kolesovv.diakontfood.presentation.screens.payment.PaymentScreen
 import com.github.kolesovv.diakontfood.presentation.ui.theme.DiakontFoodTheme
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    @Inject
+    lateinit var registerOrderUseCase: RegisterOrderUseCase
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             DiakontFoodTheme {
-                MenuScreen(
+                PaymentScreen(
+                    onBackToMenu = {
+                        Toast.makeText(
+                            this,
+                            "Скоро будем можно вернуться назад",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                )
+                /*MenuScreen(
                     onNavigateToPayment = {
                         Toast.makeText(
                             this,
@@ -31,7 +48,7 @@ class MainActivity : ComponentActivity() {
                             Toast.LENGTH_SHORT
                         ).show()
                     }
-                )
+                )*/
             }
         }
     }

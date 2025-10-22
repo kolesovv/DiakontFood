@@ -8,7 +8,7 @@ interface DiakontFoodRepository {
 
     suspend fun saveOrderToLocalDb(order: Order)
 
-    suspend fun saveOrdersToRemoteDb()
+    suspend fun saveOrderToRemoteDb(order: Order)
 
     fun getOrders(): Flow<List<Order>>
 
