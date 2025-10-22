@@ -1,6 +1,7 @@
 package com.github.kolesovv.diakontfood.domain.usecase
 
 import com.github.kolesovv.diakontfood.domain.entity.Order
+import com.github.kolesovv.diakontfood.domain.entity.PayMethod
 import com.github.kolesovv.diakontfood.domain.repository.DiakontFoodRepository
 import javax.inject.Inject
 
@@ -14,11 +15,6 @@ class RegisterOrderUseCase @Inject constructor(
             val order = Order(dishId = dishId, cardNumber = cardNumber)
             diakontFoodRepository.saveOrderToRemoteDb(order)
         }
-    }
-}
 
-enum class PayMethod {
-    GUEST,
-    CARD,
-    NO_CARD
+    }
 }

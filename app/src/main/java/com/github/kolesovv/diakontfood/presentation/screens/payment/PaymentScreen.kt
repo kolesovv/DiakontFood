@@ -42,13 +42,18 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.github.kolesovv.diakontfood.R
-import com.github.kolesovv.diakontfood.domain.usecase.PayMethod
+import com.github.kolesovv.diakontfood.domain.entity.PayMethod
 import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PaymentScreen(
-    viewModel: PaymentViewModel = hiltViewModel(),
+    dishIds: List<Int>,
+    viewModel: PaymentViewModel = hiltViewModel(
+        creationCallback = { factory: PaymentViewModel.Factory ->
+            factory.create(dishIds)
+        }
+    ),
     onBackToMenu: () -> Unit
 ) {
     val state by viewModel.state.collectAsState()

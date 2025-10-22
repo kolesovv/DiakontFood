@@ -2,17 +2,20 @@ package com.github.kolesovv.diakontfood.presentation.screens.payment
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.github.kolesovv.diakontfood.domain.usecase.PayMethod
+import com.github.kolesovv.diakontfood.domain.entity.PayMethod
 import com.github.kolesovv.diakontfood.domain.usecase.RegisterOrderUseCase
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class PaymentViewModel @Inject constructor(
+@HiltViewModel(assistedFactory = PaymentViewModel.Factory::class)
+class PaymentViewModel @AssistedInject constructor(
+    @Assisted("dishIds") private val dishIds: List<Int>,
     private val registerOrderUseCase: RegisterOrderUseCase
 ) : ViewModel() {
 
@@ -24,7 +27,11 @@ class PaymentViewModel @Inject constructor(
 
     private var currentDishIds: List<Int> = emptyList()
 
-    fun initPayment(dishIds: List<Int>) {
+    init {
+        initPayment(dishIds)
+    }
+
+    private fun initPayment(dishIds: List<Int>) {
         currentDishIds = dishIds
         _state.value = PaymentState.Initial(dishIds)
     }
@@ -70,6 +77,14 @@ class PaymentViewModel @Inject constructor(
 
     companion object {
         const val EMPTY_CARD_NUMBER = ""
+    }
+
+    @AssistedFactory
+    interface Factory {
+
+        fun create(
+            @Assisted("dishIds") dishIds: List<Int>
+        ): PaymentViewModel
     }
 }
 
