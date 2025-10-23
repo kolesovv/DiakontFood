@@ -11,7 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -25,7 +25,6 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -35,7 +34,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.SoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -43,7 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.github.kolesovv.diakontfood.R
 import com.github.kolesovv.diakontfood.domain.entity.PayMethod
-import kotlinx.coroutines.delay
+import com.github.kolesovv.diakontfood.presentation.components.DisableSoftKeyboard
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -137,14 +135,11 @@ fun PaymentContent(
     onPayNoCard: () -> Unit,
     onPayCard: () -> Unit
 ) {
-    val isCardEntered = cardNumber.isNotEmpty()
+    val isCardEntered = cardNumber.length == 10
     val focusRequester = remember { FocusRequester() }
-    val keyboardController = LocalSoftwareKeyboardController.current
 
     LaunchedEffect(Unit) {
         focusRequester.requestFocus()
-        delay(100)
-        keyboardController?.hide()
     }
 
     Column(
@@ -154,7 +149,7 @@ fun PaymentContent(
     ) {
         Text(stringResource(R.string.selected_positions, dishIds.size))
 
-        CompositionLocalProvider(LocalSoftwareKeyboardController provides NoOpKeyboardController()) {
+        DisableSoftKeyboard {
             OutlinedTextField(
                 modifier = Modifier
                     .fillMaxWidth(0.8f)
@@ -164,7 +159,6 @@ fun PaymentContent(
                     if (it.length <= 10) {
                         onCardNumberChange(it)
                     }
-                    keyboardController?.hide()
                 },
                 label = { Text(stringResource(R.string.card_number)) },
                 singleLine = true,
@@ -238,7 +232,7 @@ fun PaymentSuccess(
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
             Icon(
-                imageVector = Icons.Default.CheckCircle,
+                imageVector = Icons.Default.Check,
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(96.dp)

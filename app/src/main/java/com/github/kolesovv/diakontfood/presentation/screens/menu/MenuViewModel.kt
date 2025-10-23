@@ -1,5 +1,6 @@
 package com.github.kolesovv.diakontfood.presentation.screens.menu
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.kolesovv.diakontfood.domain.entity.Dish
@@ -50,6 +51,7 @@ class MenuViewModel @Inject constructor(
         viewModelScope.launch {
             _dishes.value = DishState.Loading
             try {
+                clearSelection()
                 updateDishesUseCase()
             } catch (e: Exception) {
                 _dishes.value = DishState.Error("Не удалось загрузить меню")

@@ -55,7 +55,19 @@ class PaymentViewModel @AssistedInject constructor(
                 val response = registerOrderUseCase(
                     dishIds = currentDishIds,
                     payMethod = payMethod,
-                    cardNumber = if (payMethod == PayMethod.CARD) _cardNumber.value else EMPTY_CARD_NUMBER
+                    cardNumber = when (payMethod) {
+                        PayMethod.GUEST -> {
+                            payMethod.code.toString()
+                        }
+
+                        PayMethod.NO_CARD -> {
+                            payMethod.code.toString()
+                        }
+
+                        else -> {
+                            _cardNumber.value
+                        }
+                    }
                 )
                 /*when (response.resultCode) {
                     OK -> _state.value = PaymentState.Success

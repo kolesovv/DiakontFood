@@ -15,6 +15,5 @@ class RegisterOrderUseCase @Inject constructor(
             val order = Order(dishId = dishId, cardNumber = cardNumber)
             diakontFoodRepository.saveOrderToRemoteDb(order)
         }
-
     }
 }
