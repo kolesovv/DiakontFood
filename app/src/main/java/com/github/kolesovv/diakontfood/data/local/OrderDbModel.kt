@@ -21,5 +21,6 @@ data class OrderDbModel(
     @PrimaryKey(autoGenerate = true)
     val orderId: Int,
     val dishId: Int,
-    val cardNumber: String
+    val cardNumber: String,
+    val timestamp: Long
 )

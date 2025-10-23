@@ -2,8 +2,11 @@ package com.github.kolesovv.diakontfood.presentation.screens.payment
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.github.kolesovv.diakontfood.domain.entity.OrderStatus
 import com.github.kolesovv.diakontfood.domain.entity.PayMethod
+import com.github.kolesovv.diakontfood.domain.repository.OrderResponse
 import com.github.kolesovv.diakontfood.domain.usecase.RegisterOrderUseCase
+import com.github.kolesovv.diakontfood.domain.usecase.SaveOrderUseCase
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -16,7 +19,8 @@ import kotlinx.coroutines.launch
 @HiltViewModel(assistedFactory = PaymentViewModel.Factory::class)
 class PaymentViewModel @AssistedInject constructor(
     @Assisted("dishIds") private val dishIds: List<Int>,
-    private val registerOrderUseCase: RegisterOrderUseCase
+    private val registerOrderUseCase: RegisterOrderUseCase,
+    private val saveOrderUseCase: SaveOrderUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow<PaymentState>(PaymentState.Initial(emptyList()))
@@ -52,7 +56,7 @@ class PaymentViewModel @AssistedInject constructor(
         viewModelScope.launch {
             _state.value = PaymentState.Loading
             try {
-                val response = registerOrderUseCase(
+                val responses = registerOrderUseCase(
                     dishIds = currentDishIds,
                     payMethod = payMethod,
                     cardNumber = when (payMethod) {
@@ -69,13 +73,27 @@ class PaymentViewModel @AssistedInject constructor(
                         }
                     }
                 )
-                /*when (response.resultCode) {
-                    OK -> _state.value = PaymentState.Success
-                    CARD_BLOCKED -> _state.value = PaymentState.Error("Карта заблокирована")
-                    CARD_NOT_FOUND -> _state.value = PaymentState.Error("Карта не найдена")
-                    USER_BLOCKED -> _state.value = PaymentState.Error("Сотрудник заблокирован")
-                    else -> _state.value = PaymentState.Error("Ошибка при оплате")
-                }*/
+                responses.forEach { orderResponse ->
+                    when (orderResponse) {
+                        is OrderResponse.Error -> PaymentState.Error(orderResponse.message)
+                        is OrderResponse.Success<OrderStatus> -> {
+                            when (orderResponse.data.code) {
+                                1 -> {
+                                    currentDishIds.forEach {
+                                        saveOrderUseCase(it, orderResponse.data.cardNumber)
+                                    }
+                                    _state.value = PaymentState.Success
+                                }
+
+                                0 -> PaymentState.Error("Ошибка выполнения: ${orderResponse.data.message}")
+                                2 -> PaymentState.Error("Карта не зарегестрирована в системе")
+                                3 -> PaymentState.Error("Карта заблокирована")
+                                4 -> PaymentState.Error("Работник заблокирован")
+                                else -> PaymentState.Error("Неизвестный ответ сервера: ${orderResponse.data.code}")
+                            }
+                        }
+                    }
+                }
                 _state.value = PaymentState.Success
             } catch (e: Exception) {
                 _state.value = PaymentState.Error("Ошибка сети")

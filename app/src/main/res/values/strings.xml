@@ -13,4 +13,9 @@
     <string name="pay_by_card">Оплатить картой</string>
     <string name="pay_as_a_guest">Оплатить как гость</string>
     <string name="pay_without_a_card">Оплатить без карты</string>
+    <string name="orders_today">Заказы на сегодня</string>
+    <string name="no_orders">Заказов нет</string>
+    <string name="order">Заказ №%1$d</string>
+    <string name="dish_id">ID блюда: %1$d</string>
+    <string name="card">Карта: %1$s</string>
 </resources>

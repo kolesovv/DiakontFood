@@ -20,6 +20,9 @@ interface DiakontFoodDao {
     @Query("SELECT * FROM orders")
     fun getOrders(): Flow<List<OrderDbModel>>
 
+    @Query("DELETE FROM orders WHERE timestamp <:startOfDay")
+    suspend fun leaveFreshOrders(startOfDay: Long)
+
     @Query("SELECT * FROM dishes")
     fun getDishes(): Flow<List<DishDbModel>>
 

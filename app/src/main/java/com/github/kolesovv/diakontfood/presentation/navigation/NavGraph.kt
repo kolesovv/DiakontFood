@@ -6,6 +6,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.github.kolesovv.diakontfood.presentation.screens.menu.MenuScreen
+import com.github.kolesovv.diakontfood.presentation.screens.orders.OrdersScreen
 import com.github.kolesovv.diakontfood.presentation.screens.payment.PaymentScreen
 
 @Composable
@@ -22,13 +23,20 @@ fun NavGraph() {
                     navController.navigate(Screen.Pay.createRoute(dishIds = it))
                 },
                 onNavigateToHistory = {
-
+                    navController.navigate(Screen.Orders.route)
                 }
             )
         }
         composable(Screen.Pay.route) {
             PaymentScreen(
                 dishIds = Screen.Pay.getDishIds(it.arguments),
+                onBackToMenu = {
+                    navController.popBackStack()
+                }
+            )
+        }
+        composable(Screen.Orders.route) {
+            OrdersScreen(
                 onBackToMenu = {
                     navController.popBackStack()
                 }
@@ -54,4 +62,6 @@ sealed class Screen(val route: String) {
             return dishIdsString.split(SEPARATOR).map { it.toInt() }
         }
     }
+
+    data object Orders : Screen("orders")
 }

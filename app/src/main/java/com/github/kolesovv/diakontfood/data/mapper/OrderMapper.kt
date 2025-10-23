@@ -9,12 +9,14 @@ import com.github.kolesovv.diakontfood.data.mapper.OrderMapperConstants.DEFAULT_
 import com.github.kolesovv.diakontfood.data.mapper.OrderMapperConstants.DEFAULT_R_VALUE
 import com.github.kolesovv.diakontfood.data.remote.OrderDto
 import com.github.kolesovv.diakontfood.domain.entity.Order
+import com.github.kolesovv.diakontfood.domain.entity.OrderStatus
 
-fun Order.toDbModel(): OrderDbModel {
+fun Order.toDbModel(timestamp: Long): OrderDbModel {
     return OrderDbModel(
         orderId = orderId,
         dishId = dishId,
-        cardNumber = cardNumber
+        cardNumber = cardNumber,
+        timestamp = timestamp
     )
 }
 
@@ -34,6 +36,14 @@ fun OrderDbModel.toEntity(): Order {
         orderId = orderId,
         dishId = dishId,
         cardNumber = cardNumber
+    )
+}
+
+fun OrderDto.toOrderStatus(): OrderStatus {
+    return OrderStatus(
+        code = rcode,
+        message = rmsg,
+        cardNumber = cardNumber.toString()
     )
 }
 
