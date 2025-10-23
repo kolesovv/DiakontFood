@@ -49,7 +49,10 @@ fun OrdersScreen(
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = onBackToMenu) {
+                    IconButton(
+                        modifier = Modifier.padding(start = 14.dp),
+                        onClick = onBackToMenu
+                    ) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = null
