@@ -201,11 +201,6 @@ fun PaymentContent(
     }
 }
 
-class NoOpKeyboardController() : SoftwareKeyboardController {
-    override fun show() {}
-    override fun hide() {}
-}
-
 @Composable
 fun PaymentError(
     message: String,
